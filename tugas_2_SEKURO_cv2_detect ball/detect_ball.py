@@ -29,23 +29,19 @@ while True:
     if not ret or frame is None:
         break
     
-    
-    # konversi warna ke hsv
     hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-    
-    # masking
+
     mask = cv.inRange(hsv, lower_bound, upper_bound)
     result = cv.bitwise_and(frame, frame, mask=mask)
-    
-    # blur
+
     blurFrame = cv.GaussianBlur(mask, (15, 15), 0)
     
     contours, _ = cv.findContours(blurFrame, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
     
     if len(contours) == 0:
-        print("gada contours")
+        print("gada objek")
     else:
-        print("adaaa")
+        print("objek terdeteksi")
         
         for contour in contours:
             area = cv.contourArea(contour)
@@ -54,18 +50,6 @@ while True:
 
                 x, y, w, h = cv.boundingRect(contour)
                 cv.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2) 
-
-    
-    # # detect circle
-    # circles = cv.HoughCircles(blurFrame, cv.HOUGH_GRADIENT, dp=1.2, minDist=100,
-    #                           param1=50, param2=50, minRadius=10, maxRadius=100)
-    
-    # if circles is not None:
-    #     circles = np.uint16(np.around(circles))
-    #     for i in circles[0, :]:
-    #         # Gambar lingkaran pada bola yang terdeteksi
-    #         cv.circle(frame, (i[0], i[1]), i[2], (0, 255, 0), 3)
-    #         cv.circle(frame, (i[0], i[1]), 2, (0, 0, 255), 3)
 
     video_resize = rescalar(frame)
     frameFileName = f"{outputFolder}/frame_{frameCount}.jpg"
@@ -78,6 +62,9 @@ while True:
     
     
     if cv.waitKey(1) & 0xFF == ord('q'):
+        break
+    
+    if cv.getWindowProperty('detect ball', cv.WND_PROP_VISIBLE) < 1:
         break
     
     frameCount += 1
